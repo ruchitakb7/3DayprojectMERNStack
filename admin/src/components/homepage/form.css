@@ -1,0 +1,22 @@
+.main-cont{
+    width: 600px;
+    height: auto;
+    padding:30px;
+    border-radius: 20px;
+    box-shadow: 4px 4px 10px rgba(162, 56, 56, 0.3);
+    margin-top: 5px;
+    background-color: pink;
+    margin-left: 300px;
+}
+
+
+.content {
+    padding: 20px;
+    width: 100%;
+    height: fit-content;
+  }
+
+  Row{
+    margin-bottom: 5px;
+  }
+  
