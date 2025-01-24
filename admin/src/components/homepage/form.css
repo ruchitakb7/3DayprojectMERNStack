@@ -6,7 +6,7 @@
     box-shadow: 4px 4px 10px rgba(162, 56, 56, 0.3);
     margin-top: 5px;
     background-color: pink;
-    margin-left: 300px;
+    
 }
 
 
@@ -14,6 +14,8 @@
     padding: 20px;
     width: 100%;
     height: fit-content;
+    margin-top: 60px;
+   
   }
 
   Row{

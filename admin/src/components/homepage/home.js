@@ -10,7 +10,7 @@ const Home = () => {
       <Header />
       <div className="content">
         <Routes>
-        <Route index element={<HotelList />} ></Route>
+        <Route index element={<CreateData />} ></Route>
           <Route path="hotels" element={<HotelList />} />
           <Route path="search" element={<p>Search Page (Work in Progress)</p>} />
           <Route path="request" element={<p>Notifications Page (Work in Progress)</p>} />

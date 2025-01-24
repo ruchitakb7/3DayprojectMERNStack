@@ -1,101 +1,143 @@
+import React, { useState,useContext } from "react";
+import "./form.css";
+import { Row, Col, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Datacontext } from "../ContextApi/context";
 
-import React, { useState } from "react";
-import "./form.css"
-import { Row,Col,Form,Button } from "react-bootstrap";
-const ListingForm = ({ initialData = {}, onSubmit }) => {
- 
-  const [formData, setFormData] = useState({
-    placeName: initialData.placeName || "",
-    pricePerNight: initialData.pricePerNight || "",
-    address: initialData.address || "",
-    city: initialData.city || "",
-    pinCode: initialData.pinCode || "",
-    images: [],
-    category: initialData.category || "Villa",
-  });
-
- 
+const ListingForm = () => {
+  
+  const [formData, setFormData] = useState({});
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
+  const ctx=useContext(Datacontext)
+  const navigate=useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle file input for images
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setFormData({ ...formData, images: files });
+    setSelectedFiles(files); 
 
-    // Generate image previews
     const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData); // Pass form data to parent
+
+   
+    const data = new FormData();
+    data.append("placename", formData.placename || "");
+    data.append("pricePerNight", formData.pricePerNight || "");
+    data.append("address", formData.address || "");
+    data.append("city", formData.city || "");
+    data.append("pincode", formData.pincode || "");
+    data.append("category", formData.category || ""); 
+
+  
+    selectedFiles.forEach((file) => {
+      data.append("images", file);
+    });
+
+   ctx.postData(data)
+   navigate('/home/hotels')
   };
 
   return (
-    <div className="main-cont">
-    
+    <center>  <div className="main-cont " >
       <form onSubmit={handleSubmit}>
-      
         <Row className="mb-3">
-          <Col> <Form.Label>Placename:</Form.Label></Col>
-          <Col><Form.Control  type="text"
-            name="placeName"
-            value={formData.placeName}
-            onChange={handleChange}
-            required></Form.Control></Col>
-        </Row>
-
-        {/* Price per Night */}
-        <Row  className="mb-3">
-          <Col> <Form.Label>Price per Night:</Form.Label></Col>
-          <Col><Form.Control type="number"
-            name="pricePerNight"
-            value={formData.pricePerNight}
-            onChange={handleChange}
-            required ></Form.Control></Col>
-        </Row>
-        <Row  className="mb-3">
-          <Col> <Form.Label>Address:</Form.Label></Col>
-          <Col><Form.Control  type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            required ></Form.Control></Col>
-        </Row>
-        <Row  className="mb-3">
-          <Col> <Form.Label>City:</Form.Label></Col>
-          <Col><Form.Control  type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required ></Form.Control></Col>
-        </Row>
-        <Row  className="mb-3">
-          <Col> <Form.Label>PIN code:</Form.Label></Col>
-          <Col><Form.Control  type="text"
-            name="pincode"
-            value={formData.pinCode}
-            onChange={handleChange}
-            required ></Form.Control></Col>
-        </Row>
-
-        <Row  className="mb-3">
-          <Col><Form.Label>Upload Images:</Form.Label></Col>
           <Col>
-          <Form.Control  type="file"
-            name="images"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}></Form.Control>
-            </Col>
+            <Form.Label>Place Name:</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="text"
+              name="placename"
+              value={formData.placename || ""}
+              onChange={handleChange}
+              required
+            />
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col>
+            <Form.Label>Price per Night:</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="number"
+              name="pricePerNight"
+              value={formData.pricePerNight || ""}
+              onChange={handleChange}
+              required
+            />
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col>
+            <Form.Label>Address:</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="text"
+              name="address"
+              value={formData.address || ""}
+              onChange={handleChange}
+              required
+            />
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col>
+            <Form.Label>City:</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="text"
+              name="city"
+              value={formData.city || ""}
+              onChange={handleChange}
+              required
+            />
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col>
+            <Form.Label>PIN Code:</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="number"
+              name="pincode"
+              value={formData.pincode || ""}
+              onChange={handleChange}
+              required
+            />
+          </Col>
+        </Row>
+
+        <Row className="mb-3">
+          <Col>
+            <Form.Label>Upload Images:</Form.Label>
+          </Col>
+          <Col>
+            <Form.Control
+              type="file"
+              name="images"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </Col>
           {imagePreviews.length > 0 && (
             <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
               {imagePreviews.map((preview, index) => (
@@ -108,26 +150,32 @@ const ListingForm = ({ initialData = {}, onSubmit }) => {
               ))}
             </div>
           )}
-         </Row>
-   
-        <Row  className="mb-3"> 
-          <Col><Form.Label>Category:</Form.Label></Col>
-          <Col> <Form.Select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-          >
-            <option value="Villa">Villa</option>
-            <option value="Apartment">Apartment</option>
-            <option value="Houseboat">Houseboat</option>
-          </Form.Select></Col>
-         
         </Row>
 
-        {/* Submit Button */}
-        <Button type="submit" className="w-100">Save</Button>
+        <Row className="mb-3">
+          <Col>
+            <Form.Label>Category:</Form.Label>
+          </Col>
+          <Col>
+            <Form.Select
+              name="category"
+              value={formData.category || ""}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Category</option>
+              <option value="Villa">Villa</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Houseboat">Houseboat</option>
+            </Form.Select>
+          </Col>
+        </Row>
+
+        <Button type="submit" className="w-100">
+          Save
+        </Button>
       </form>
-    </div>
+    </div></center>
   );
 };
 
