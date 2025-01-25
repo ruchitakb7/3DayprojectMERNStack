@@ -10,8 +10,6 @@ export const Dataprovider=({children})=>{
     const [error,setError]=useState('')
     const [notif,setNotif]=useState('')
    
-
-
     const fetchData=async()=>{
         try {
             const response = await axios.get("http://localhost:3006/gethotels"); 

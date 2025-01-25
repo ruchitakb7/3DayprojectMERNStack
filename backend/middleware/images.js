@@ -12,6 +12,8 @@ const storage = multer.diskStorage({
 });
 
 
+
+
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, 
@@ -22,29 +24,65 @@ const upload = multer({
       cb(new Error("Only image files are allowed"), false); 
     }
   },
-}).array("images", 6); 
+}).fields([
+  { name: 'binaryImages', maxCount: 6 }, 
+  { name: 'images', maxCount: 6 },       
+])
 
 
 const convertImageToBase64 = (req, res, next) => {
-  if (req.files && req.files.length > 0) { 
-    try {
+
+  const images = [];
+
+  // if (req.files && req.files.length > 0) {
+  //   req.files.forEach((file) => {
+  //     const filePath = path.join(__dirname, '..', "uploads", file.filename);
+  //     const fileData = fs.readFileSync(filePath, { encoding: "base64" });
+     
+  //     fs.unlinkSync(filePath);
     
-      req.body.images = req.files.map((file) => {
-        const filePath = path.join(__dirname,'..', "uploads", file.filename);
-        const fileData = fs.readFileSync(filePath, { encoding: "base64" });
-      
-        fs.unlinkSync(filePath);
-        return `data:${file.mimetype};base64,${fileData}`;
-      });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ error: "Failed to process images", details: err });
-    }
-  } else {
-    req.body.images = []; 
+  //     images.push(`data:${file.mimetype};base64,${fileData}`);
+  //   });
+  // }
+
+
+  if (req.files && req.files['binaryImages']) {
+    req.files['binaryImages'].forEach((file) => {
+      const filePath = path.join(__dirname, '..', "uploads", file.filename);
+      const fileData = fs.readFileSync(filePath, { encoding: "base64" });
+
+      fs.unlinkSync(filePath); 
+
+      images.push(`data:${file.mimetype};base64,${fileData}`);
+    });
   }
-  next(); 
-}
+
+
+  if (req.files && req.files['images']) {
+    req.files['images'].forEach((file) => {
+      const filePath = path.join(__dirname, '..', "uploads", file.filename);
+      const fileData = fs.readFileSync(filePath, { encoding: "base64" });
+
+      fs.unlinkSync(filePath); 
+
+      images.push(`data:${file.mimetype};base64,${fileData}`);
+    });
+  }
+
+  
+  if (req.body.base64Images) {
+    const base64img = JSON.parse(req.body.base64Images);
+    base64img.forEach((image) => {
+      if (typeof image === "string" && image.startsWith("data:image")) {
+        images.push(image); 
+      }
+    });
+  }
+  
+
+  req.body.images = images;
+  console.log(images.length)
+  next();
+};
 
 module.exports = { upload, convertImageToBase64 };

@@ -3,11 +3,13 @@ import "./form.css";
 import { Row, Col, Form, Button,Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { Datacontext } from "../ContextApi/context";
+import Loading from "../UPI/spinner";
 
 const EditModal = ({ hotel,show, onHide }) => {
   const [formData, setFormData] = useState({});
   const [imagePreviews, setImagePreviews] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const ctx = useContext(Datacontext);
   const navigate = useNavigate();
@@ -33,9 +35,10 @@ const EditModal = ({ hotel,show, onHide }) => {
   };
 
   const handleImageChange = (e) => {
-    console.log(e.target.value)
+    console.log('image',e.target.value)
     const files = Array.from(e.target.files);
-    setSelectedFiles((prev)=> [...prev,...files]);
+    setSelectedFiles(()=> [...files]);
+   
 
     const previews = files.map((file) => URL.createObjectURL(file));
     
@@ -44,6 +47,7 @@ const EditModal = ({ hotel,show, onHide }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
 
     const data = new FormData();
     data.append("placename", formData.placename);
@@ -53,23 +57,40 @@ const EditModal = ({ hotel,show, onHide }) => {
     data.append("pincode", formData.pincode);
     data.append("category", formData.category);
     data.append("_id", hotel._id); 
+    data.append("images",'')
 
-    if (selectedFiles.length > 0) {
-   
-      selectedFiles.forEach((file) => {
-        data.append("images", file);
-      });
-    } else {
-    
-      hotel.images.forEach((image) => {
-        data.append("existingImages", image); 
-      });
+    if(imagePreviews){
+      const base64Images = JSON.stringify(imagePreviews); 
+      data.append("base64Images", base64Images);
     }
-
-     ctx.editData(data);
-     onHide()
-    navigate('/home/hotels');
+    
+    selectedFiles.forEach((file) => {
+      data.append("binaryImages", file);
+    });
+    
+    ctx.editData(data)  
+    .then(() => {
+      onHide(); 
+      navigate('/home/hotels'); 
+    })
+    .catch((error) => {
+      console.error("Error editing data:", error);
+      return <p>{error}</p>
+    
+    })
+    .finally(() => {
+      setLoading(false); 
+    });
   };
+
+  const handleRemoveImage=async(name)=>{
+     console.log(name)
+     const updatedImages = imagePreviews.filter((file) => file !== name);
+     setImagePreviews(updatedImages);
+  }
+
+  if(loading)
+    return<Loading></Loading>
 
   return (
     <Modal show={show} onHide={onHide} size="lg" centered>
@@ -166,18 +187,18 @@ const EditModal = ({ hotel,show, onHide }) => {
                                          onChange={handleImageChange}
                                        />
                                      </Col>
+                                                                                                      
                                      {imagePreviews.length > 0 && (
-                                       <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-                                         {imagePreviews.map((preview, index) => (
-                                           <img
-                                             key={index}
-                                             src={preview}
-                                             alt={`Preview ${index + 1}`}
-                                             style={{ width: "100px", height: "100px", objectFit: "cover" }}
-                                           />
-                                         ))}
-                                       </div>
-                                     )}
+                                      <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                                           {imagePreviews.map((preview, index) => (
+                                             <div key={index} style={{ position: "relative", display: "inline-block" }}>
+                                               <img src={preview} alt={`Preview ${index + 1}`}
+                                                 style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px" }}/>
+                                               <button onClick={() => handleRemoveImage(preview)}  
+                                              className="remove-image-btn" >X</button>
+                                             </div>
+                                           ))}
+                                          </div>)}
                                    </Row>
                            
                                    <Row className="mb-3">

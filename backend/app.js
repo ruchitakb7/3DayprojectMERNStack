@@ -19,7 +19,7 @@ app.use(adminroute)
 
 
 
-mongoose.connect(`mongodb+srv://ruchitakb7:@cluster1.d6wyg.mongodb.net/travelwebsite`)
+mongoose.connect(`mongodb+srv://ruchitakb7:${process.env.pass}@cluster1.d6wyg.mongodb.net/travelwebsite`)
 .then(res=>{
     server.listen(3006)
     console.log('connected')

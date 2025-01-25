@@ -69,12 +69,11 @@ exports.editData=async (req,res,next)=>{
 
        const response= await Stays.findByIdAndUpdate(_id,updates,{ new: true, runValidators: true })
       
- 
         res.status(200).json({message:"Data has been successfully updated"})
 
   }catch(e){
     console.log(e)
-    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 
 }
@@ -82,8 +81,6 @@ exports.editData=async (req,res,next)=>{
 
 exports.deleteData=async(req,res,next)=>{
   const id=req.params.id
- 
-
   try{
       const response= await Stays.findByIdAndDelete(id)
     

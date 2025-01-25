@@ -12,7 +12,6 @@ const HotelList = () => {
   const [show, setShow] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [search, setSearch] = useState("");
-
   const [hotels, setHotels] = useState([]); 
 
   useEffect(() => {
